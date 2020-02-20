@@ -1,7 +1,7 @@
 <template>
   <div id="add-blog">
     <h2>Add a New Blog Post</h2>
-    <form>
+    <form v-if="!submitted">
       <label>Blog Title</label>
       <input type="text" v-model.lazy="blog.title"></input>
 
@@ -19,18 +19,27 @@
         <input type="checkbox" value="mario" v-model="blog.categories"/>
       </div>
 
-      <div id="preview">
-        <h3>Preview Blog</h3>
-        <p>Blog Title: {{blog.title}} </p>
-        <p>Blog Content:</p>
-        <p>{{blog.content}}</p>
-        <p>Blog Categories:</p>
-        <ul>
-        <li v-for="category in blog.categories">{{category}}</li>
-        
-        </ul>
-      </div>
+      <label>Author:</label>
+      <select v-model="blog.author">
+        <option v-for="author in authors">{{author}}</option>
+      </select>
+
+      <button @click.prevent="post">Add Blog</button>
     </form>
+    <div v-if="submitted">
+      <h3>Thanks for adding your post</h3>
+    </div>
+    <div id="preview">
+      <h3>Preview Blog</h3>
+      <p>Blog Title: {{blog.title}} </p>
+      <p>Blog Content:</p>
+      <p>{{blog.content}}</p>
+      <p>Blog Categories:</p>
+      <ul>
+        <li v-for="category in blog.categories">{{category}}</li>
+      </ul>
+      <p>Author: {{blog.author}}</p>
+    </div>
   </div>
 </template>
 
@@ -42,8 +51,23 @@ export default {
       blog: {
         title: "",
         content: "",
-        categories: []
-      }
+        categories: [],
+        author: ""
+      },
+      authors: ['The Net Ninja', 'The Anuglar Avenger', 'The Vue Vindicator'],
+      submitted: false
+    }
+  },
+  methods: {
+    post(){
+      this.$http.post('http://jsonplaceholder.typicode.com/posts', {
+        title: this.blog.title,
+        body: this.blog.content,
+        userId: 1
+      }).then(function(data){
+        console.log(data);
+        this.submitted = true;
+      })
     }
   }
 }
